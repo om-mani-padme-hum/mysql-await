@@ -15,6 +15,10 @@
     "async",
     "await"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/om-mani-padme-hum/mysql-await"
+  },
   "author": "Rich Lowe",
   "license": "MIT"
 }

@@ -1,16 +1,30 @@
-# MySQL Async/Await Wrapper
+# MySQL Async/Await Wrapper v1.01
 
 Basic API for performing async/await MySQL queries on a pool.  A new connection is created, queried, and released for each call to `query()`.
 
 ## Configuration:
 
-```json
+### JavaScript
+
+```javascript
 {
   connectionLimit : 10,
   host            : 'example.org',
   user            : 'bob',
   password        : 'secret',
   database        : 'my_db'
+}
+```
+
+### JSON
+
+```json
+{
+  "connectionLimit" : 10,
+  "host"            : "example.org",
+  "user"            : "bob",
+  "password"        : "secret",
+  "database"        : "my_db"
 }
 ```
 
