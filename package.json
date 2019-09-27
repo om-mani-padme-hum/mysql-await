@@ -1,0 +1,20 @@
+{
+  "name": "mysql-await",
+  "version": "1.0.0",
+  "description": "Simple MySQL Async/Await Connection Pool",
+  "main": "index.js",
+  "dependencies": {
+    "mysql": "^2.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "eslint index.js"
+  },
+  "keywords": [
+    "mysql",
+    "async",
+    "await"
+  ],
+  "author": "Rich Lowe",
+  "license": "MIT"
+}
