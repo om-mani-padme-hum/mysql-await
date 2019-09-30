@@ -1,4 +1,4 @@
-# MySQL Async/Await Wrapper v2.0.1
+# MySQL Async/Await Wrapper v2.0.2
 
 Simple wrapper for MySQL async/await functionality.  Intended for functionality to mimic the popular `mysql` Node.js callback-based package, but with additional methods for awaiting execution.  Goal is for normal methods to be unaffected and only additional await methods added, though accomplished through intermediary class objects.
 
@@ -23,7 +23,7 @@ The methods below have been added as async/await wrappers to existing MySQL meth
 * Pool.awaitGetConnection()
 * Pool.awaitQuery(query[, params])
 
-## Connections from pool.getConnection()
+### Connections from pool.getConnection()
 
 * Connection.awaitBeginTransaction()
 * Connection.awaitChangeUser(params)
