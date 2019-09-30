@@ -1,10 +1,10 @@
-# MySQL Async/Await Wrapper v2.0.3
+# MySQL Async/Await Wrapper v2.0.4
 
-Simple wrapper for MySQL async/await functionality.  Intended for functionality to mimic the popular `mysql` Node.js callback-based package, but with additional methods for awaiting execution.  Goal is for normal methods to be unaffected and only additional await methods added, though accomplished through intermediary class objects.
+Simple wrapper for MySQL async/await functionality.  Intended for functionality to mimic the popular [mysql](https://github.com/mysqljs/mysql) Node.js callback-based package, but with additional methods for awaiting execution.  Goal is for normal methods to be unaffected and only additional await methods added, though accomplished through intermediary class objects.
 
 ## Provided async/await methods
 
-The methods below have been added as async/await wrappers to existing MySQL methods of similar name.  In order to use them, simply "await" their execution rather than passing a callback for the last argument of the function call.
+The methods below have been added as async/await wrappers to existing MySQL methods of similar name.  In order to use them, simply "await" their execution rather than passing a callback for the last argument of the function call.  For original methods for which "await" methods may have been added, as needed, see the [mysql](https://github.com/mysqljs/mysql) library.
 
 ### Connections from mysql.createConnect()
 
