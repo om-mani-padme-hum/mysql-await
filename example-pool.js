@@ -29,7 +29,7 @@ const mysql = require(`./index`);
   });
 
   /** Perform query on connection */
-  let result = await connection.awaitQuery(`SELECT * FROM transactions WHERE ticker = ?`, [`DE`]);
+  let result = await connection.awaitQuery(`SELECT * FROM people WHERE lastName = ?`, [`Smith`]);
   
   /** Log output */
   console.log(result);
@@ -38,7 +38,7 @@ const mysql = require(`./index`);
   connection.release();
     
   /** Perform query on pool (opens a connection, runs query, releases connection) */
-  result = await pool.awaitQuery(`SELECT * FROM transactions WHERE ticker = ?`, [`KSS`]);
+  result = await pool.awaitQuery(`SELECT * FROM people WHERE age = ?`, [45]);
   
   /** Log output */
   console.log(result);
@@ -50,13 +50,13 @@ const mysql = require(`./index`);
   await connection2.awaitBeginTransaction();
   
   /** Perform query for max id number in users table */
-  result = await connection2.awaitQuery(`SELECT MAX(id) maxId FROM users`);
+  result = await connection2.awaitQuery(`SELECT MAX(id) maxId FROM people`);
   
   /** Add one to max id to get new id number */
   const newId = result[0].maxId + 1;
   
   /** Insert new test user with new id number */
-  await connection2.awaitQuery(`INSERT INTO users (id, hash, username, name, accounts) VALUES (?, ?, ?, ?, ?)`, [newId, ``, `testuser`, `Test User`, ``]);
+  await connection2.awaitQuery(`INSERT INTO people (id, firstName, lastName, age) VALUES (?, ?, ?, ?)`, [newId, `Jacob`, `Marley`, 147]);
   
   /** Commit transaction */
   await connection2.awaitCommit();
