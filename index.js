@@ -28,7 +28,7 @@ class ConnectionAwait {
       try {
         this.connection.beginTransaction((err) => {
           if ( err )
-            reject(err);
+            return reject(err);
           
           this.inTransaction = true;
           resolve();
@@ -50,7 +50,7 @@ class ConnectionAwait {
       try {
         this.connection.changeUser(params, (err) => {
           if ( err )
-            reject(err);
+            return reject(err);
           
           resolve();
         });
@@ -100,7 +100,7 @@ class ConnectionAwait {
       try {
         this.connection.connect((err) => {
           if ( err )
-            reject(err);
+            return reject(err);
           
           resolve();
         });
@@ -120,7 +120,7 @@ class ConnectionAwait {
       try {
         this.connection.destroy((err) => {
           if ( err )
-            reject(err);
+            return reject(err);
           
           resolve();
         });
@@ -140,7 +140,7 @@ class ConnectionAwait {
       try {
         this.connection.end((err) => {
           if ( err )
-            reject(err);
+            return reject(err);
           
           resolve();
         });
@@ -327,7 +327,7 @@ class PoolAwait {
       try {
         this.pool.end((err) => {
           if ( err )
-            reject(err);
+            return reject(err);
 
           resolve();
         });
@@ -349,7 +349,7 @@ class PoolAwait {
       try {
         this.pool.getConnection((err, connection) => {
           if ( err )
-            reject(err);
+            return reject(err);
           
           connection.inTransaction = false;
           
@@ -363,7 +363,7 @@ class PoolAwait {
               try {
                 this.beginTransaction((err) => {
                   if ( err )
-                    reject(err);
+                    return reject(err);
                   
                   this.inTransaction = true;
                   resolve();
@@ -385,7 +385,7 @@ class PoolAwait {
               try {
                 this.changeUser(params, (err) => {
                   if ( err )
-                    reject(err);
+                    return reject(err);
 
                   resolve();
                 });
@@ -438,7 +438,7 @@ class PoolAwait {
                 if ( typeof params === `undefined` ) {
                   this.query(query, (err, result) => {
                     if ( err )
-                      reject(err);
+                      return reject(err);
                     
                     resolve(result);
                   });
@@ -502,14 +502,14 @@ class PoolAwait {
         if ( typeof params === `undefined` ) {
           this.pool.query(query, (err, result) => {
             if ( err )
-              reject(err);
+              return reject(err);
 
             resolve(result);
           });
         } else {
           this.pool.query(query, params, (err, result) => {
             if ( err )
-              reject(err);
+              return reject(err);
 
             resolve(result);
           });
