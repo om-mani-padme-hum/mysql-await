@@ -61,6 +61,13 @@ const mysql = require(`./index`);
   /** Commit transaction */
   await connection2.awaitCommit();
   
+  /** Test error handling */
+  try {
+    await connection2.awaitQuery(`SELECTJKLSDF`);
+  } catch (err) {
+    console.log(err);
+  }
+  
   /** Release connection */
   connection2.release();
   

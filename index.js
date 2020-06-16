@@ -25,17 +25,13 @@ class ConnectionAwait {
    */
   awaitBeginTransaction() {
     return new Promise((resolve, reject) => {
-      try {
-        this.connection.beginTransaction((err) => {
-          if ( err )
-            return reject(err);
-          
-          this.inTransaction = true;
-          resolve();
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+      this.connection.beginTransaction((err) => {
+        if ( err )
+          return reject(err);
+
+        this.inTransaction = true;
+        resolve();
+      });
     });
   }
   
@@ -47,16 +43,12 @@ class ConnectionAwait {
    */
   awaitChangeUser(params) {
     return new Promise((resolve, reject) => {
-      try {
-        this.connection.changeUser(params, (err) => {
-          if ( err )
-            return reject(err);
-          
-          resolve();
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+      this.connection.changeUser(params, (err) => {
+        if ( err )
+          return reject(err);
+
+        resolve();
+      });
     });
   }
   
@@ -67,26 +59,22 @@ class ConnectionAwait {
    */
   awaitCommit() {
     return new Promise((resolve, reject) => {
-      try {
-        this.connection.commit((err) => {
-          if ( err ) {
-            if ( this.inTransaction ) {
-              this.connection.rollback(() => {
-                this.inTransaction = false;
-                reject(err);
-              });
-            } else {
+      this.connection.commit((err) => {
+        if ( err ) {
+          if ( this.inTransaction ) {
+            this.connection.rollback(() => {
               this.inTransaction = false;
               reject(err);
-            }
+            });
           } else {
             this.inTransaction = false;
-            resolve();
+            reject(err);
           }
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+        } else {
+          this.inTransaction = false;
+          resolve();
+        }
+      });
     });
   }
   
@@ -97,16 +85,12 @@ class ConnectionAwait {
    */
   awaitConnect() {
     return new Promise((resolve, reject) => {
-      try {
-        this.connection.connect((err) => {
-          if ( err )
-            return reject(err);
-          
-          resolve();
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+      this.connection.connect((err) => {
+        if ( err )
+          return reject(err);
+
+        resolve();
+      });
     });
   }
   
@@ -117,16 +101,12 @@ class ConnectionAwait {
    */
   awaitDestroy() {
     return new Promise((resolve, reject) => {
-      try {
-        this.connection.destroy((err) => {
-          if ( err )
-            return reject(err);
-          
-          resolve();
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+      this.connection.destroy((err) => {
+        if ( err )
+          return reject(err);
+
+        resolve();
+      });
     });
   }
   
@@ -137,16 +117,12 @@ class ConnectionAwait {
    */
   awaitEnd() {
     return new Promise((resolve, reject) => {
-      try {
-        this.connection.end((err) => {
-          if ( err )
-            return reject(err);
-          
-          resolve();
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+      this.connection.end((err) => {
+        if ( err )
+          return reject(err);
+
+        resolve();
+      });
     });
   }
   
@@ -159,40 +135,36 @@ class ConnectionAwait {
    */
   awaitQuery(query, params) {
     return new Promise((resolve, reject) => {
-      try {
-        if ( typeof params === `undefined` ) {
-          this.connection.query(query, (err, result) => {
-            if ( err ) {
-              if ( this.inTransaction ) {
-                this.connection.rollback(() => {
-                  this.inTransaction = false;
-                  reject(err);
-                });
-              } else {
+      if ( typeof params === `undefined` ) {
+        this.connection.query(query, (err, result) => {
+          if ( err ) {
+            if ( this.inTransaction ) {
+              this.connection.rollback(() => {
+                this.inTransaction = false;
                 reject(err);
-              }
+              });
             } else {
-              resolve(result);
+              reject(err);
             }
-          });
-        } else {
-          this.connection.query(query, params, (err, result) => {
-            if ( err ) {
-              if ( this.inTransaction ) {
-                this.connection.rollback(() => {
-                  this.inTransaction = false;
-                  reject(err);
-                });
-              } else {
+          } else {
+            resolve(result);
+          }
+        });
+      } else {
+        this.connection.query(query, params, (err, result) => {
+          if ( err ) {
+            if ( this.inTransaction ) {
+              this.connection.rollback(() => {
+                this.inTransaction = false;
                 reject(err);
-              }
+              });
             } else {
-              resolve(result);
+              reject(err);
             }
-          });
-        }
-      } catch ( err ) {
-        reject(err);
+          } else {
+            resolve(result);
+          }
+        });
       }
     });
   }
@@ -204,13 +176,9 @@ class ConnectionAwait {
    */
   awaitRollback() {
     return new Promise((resolve, reject) => {
-      try {
-        this.connection.rollback(() => {
-          resolve();
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+      this.connection.rollback(() => {
+        resolve();
+      });
     });
   }
   
@@ -324,16 +292,12 @@ class PoolAwait {
    */
   awaitEnd() {
     return new Promise((resolve, reject) => {
-      try {
-        this.pool.end((err) => {
-          if ( err )
-            return reject(err);
+      this.pool.end((err) => {
+        if ( err )
+          return reject(err);
 
-          resolve();
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+        resolve();
+      });
     });
   }
   
@@ -346,146 +310,122 @@ class PoolAwait {
    */
   awaitGetConnection() {
     return new Promise(async (resolve, reject) => {
-      try {
-        this.pool.getConnection((err, connection) => {
-          if ( err )
-            return reject(err);
-          
-          connection.inTransaction = false;
-          
-          /**
-           * @signature awaitBeginTransaction()
-           * @returns Promise
-           * @description Begin a new transaction.
-           */
-          connection.awaitBeginTransaction = function () {
-            return new Promise((resolve, reject) => {
-              try {
-                this.beginTransaction((err) => {
-                  if ( err )
-                    return reject(err);
-                  
-                  this.inTransaction = true;
-                  resolve();
-                });
-              } catch ( err ) {
-                reject(err);
-              }
+      this.pool.getConnection((err, connection) => {
+        if ( err )
+          return reject(err);
+
+        connection.inTransaction = false;
+
+        /**
+         * @signature awaitBeginTransaction()
+         * @returns Promise
+         * @description Begin a new transaction.
+         */
+        connection.awaitBeginTransaction = function () {
+          return new Promise((resolve, reject) => {
+            this.beginTransaction((err) => {
+              if ( err )
+                return reject(err);
+
+              this.inTransaction = true;
+              resolve();
             });
-          }
+          });
+        }
 
-          /**
-           * @signature awaitChangeUser(params)
-           * @param params Object First argument of MySQL's Connection.changeUser()
-           * @returns Promise
-           * @description Change the current user without shutting down socket.
-           */
-          connection.awaitChangeUser = function (params) {
-            return new Promise((resolve, reject) => {
-              try {
-                this.changeUser(params, (err) => {
-                  if ( err )
-                    return reject(err);
+        /**
+         * @signature awaitChangeUser(params)
+         * @param params Object First argument of MySQL's Connection.changeUser()
+         * @returns Promise
+         * @description Change the current user without shutting down socket.
+         */
+        connection.awaitChangeUser = function (params) {
+          return new Promise((resolve, reject) => {
+            this.changeUser(params, (err) => {
+              if ( err )
+                return reject(err);
 
-                  resolve();
-                });
-              } catch ( err ) {
-                reject(err);
-              }
+              resolve();
             });
-          }
+          });
+        }
 
-          /**
-           * @signature awaitCommit()
-           * @returns Promise
-           * @description Commit a transaction.
-           */
-          connection.awaitCommit = function () {
-            return new Promise((resolve, reject) => {
-              try {
-                this.commit((err) => {
-                  if ( err ) {
-                    if ( this.inTransaction ) {
-                      this.connection.rollback(() => {
-                        this.inTransaction = false;
-                        reject(err);
-                      });
-                    } else {
-                      this.inTransaction = false;
-                      reject(err);
-                    }
-                  } else {
+        /**
+         * @signature awaitCommit()
+         * @returns Promise
+         * @description Commit a transaction.
+         */
+        connection.awaitCommit = function () {
+          return new Promise((resolve, reject) => {
+            this.commit((err) => {
+              if ( err ) {
+                if ( this.inTransaction ) {
+                  this.connection.rollback(() => {
                     this.inTransaction = false;
-                    resolve();
-                  }
-                });
-              } catch ( err ) {
-                reject(err);
-              }
-            });
-          };
-
-          /**
-           * @signature awaitQuery(query[, params])
-           * @param query string First argument of MySQL's Connection.query()
-           * @param params Array (optional) Second argument of MySQL's Connection.query() if not used for callback
-           * @returns Promise
-           * @description Queries the MySQL database, returning a [Promise] that resolves when finished or rejects on error.  
-           */
-          connection.awaitQuery = function (query, params) {
-            return new Promise((resolve, reject) => {
-              try {
-                if ( typeof params === `undefined` ) {
-                  this.query(query, (err, result) => {
-                    if ( err )
-                      return reject(err);
-                    
-                    resolve(result);
+                    reject(err);
                   });
                 } else {
-                  this.query(query, params, (err, result) => {
-                    if ( err ) {
-                      if ( this.inTransaction ) {
-                        this.rollback(() => {
-                          this.inTransaction = false;
-                          reject(err);
-                        });
-                      } else {
-                        reject(err);
-                      }
-                    } else {
-                      resolve(result);
-                    }
-                  });
+                  this.inTransaction = false;
+                  reject(err);
                 }
-              } catch ( err ) {
-                reject(err);
+              } else {
+                this.inTransaction = false;
+                resolve();
               }
             });
-          };
-          
-          /**
-           * @signature awaitRollback()
-           * @returns Promise
-           * @description Rolls back a transaction.
-           */
-          connection.awaitRollback = function () {
-            return new Promise((resolve, reject) => {
-              try {
-                this.rollback(() => {
-                  resolve();
-                });
-              } catch ( err ) {
-                reject(err);
-              }
+          });
+        };
+
+        /**
+         * @signature awaitQuery(query[, params])
+         * @param query string First argument of MySQL's Connection.query()
+         * @param params Array (optional) Second argument of MySQL's Connection.query() if not used for callback
+         * @returns Promise
+         * @description Queries the MySQL database, returning a [Promise] that resolves when finished or rejects on error.  
+         */
+        connection.awaitQuery = function (query, params) {
+          return new Promise((resolve, reject) => {
+            if ( typeof params === `undefined` ) {
+              this.query(query, (err, result) => {
+                if ( err )
+                  return reject(err);
+
+                resolve(result);
+              });
+            } else {
+              this.query(query, params, (err, result) => {
+                if ( err ) {
+                  if ( this.inTransaction ) {
+                    this.rollback(() => {
+                      this.inTransaction = false;
+                      reject(err);
+                    });
+                  } else {
+                    reject(err);
+                  }
+                } else {
+                  resolve(result);
+                }
+              });
+            }
+          });
+        };
+
+        /**
+         * @signature awaitRollback()
+         * @returns Promise
+         * @description Rolls back a transaction.
+         */
+        connection.awaitRollback = function () {
+          return new Promise((resolve, reject) => {
+            this.rollback(() => {
+              resolve();
             });
-          };
-                    
-          resolve(connection);
-        });
-      } catch ( err ) {
-        reject(err);
-      }
+          });
+        };
+
+        resolve(connection);
+      });
     });
   };
   
@@ -581,7 +521,7 @@ class MySQLAwait {
    * @description Pass along functionality of format.
    */
   format() {
-    return mysql.format(data);
+    return mysql.format(...arguments);
   }
 }
 
