@@ -1,4 +1,4 @@
-# MySQL Async/Await Wrapper v2.1.6
+# MySQL Async/Await Wrapper v2.1.7
 
 Simple wrapper for MySQL async/await functionality.  Intended for functionality to mimic the popular [mysql](https://github.com/mysqljs/mysql) Node.js callback-based package, but with additional methods for awaiting execution.  Goal is for normal methods to be unaffected and only additional await methods added, though accomplished through intermediary class objects.
 
@@ -217,6 +217,7 @@ Connection 16 released
 Please open an issue for any bugs found or feature requests
 
 * Thanks, @DavidvanDriessche, for identifying a significant issue with error handling
+* THanks, @DonaldKellet, for identifying missing arguments on the escape() and escapeId() functions
 
 ## License
 

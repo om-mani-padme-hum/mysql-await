@@ -242,7 +242,7 @@ class ConnectionAwait {
    * @signature escapeId(data)
    * @description Pass along functionality of escapeId.
    */
-  escapeId() {
+  escapeId(data) {
     return this.connection.escapeId(data);
   }
   
