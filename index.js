@@ -234,7 +234,7 @@ class ConnectionAwait {
    * @signature escape(data)
    * @description Pass along functionality of escape.
    */
-  escape() {
+  escape(data) {
     return this.connection.escape(data);
   }
   
