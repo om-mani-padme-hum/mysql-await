@@ -1,4 +1,4 @@
-# MySQL Async/Await Wrapper v2.1.7
+# MySQL Async/Await Wrapper v2.1.8
 
 Simple wrapper for MySQL async/await functionality.  Intended for functionality to mimic the popular [mysql](https://github.com/mysqljs/mysql) Node.js callback-based package, but with additional methods for awaiting execution.  Goal is for normal methods to be unaffected and only additional await methods added, though accomplished through intermediary class objects.
 
@@ -7,7 +7,7 @@ Simple wrapper for MySQL async/await functionality.  Intended for functionality 
 * [Configuration](#configuration)
 * [Example Using Single Connection](#example-using-single-connection)
 * [Example Using Connection Pool](#example-using-connection-pool)
-* [Fringe Features Not Currently Support](#fringe-features-not-currently-supported)
+* [Fringe Features Not Currently Supported](#fringe-features-not-currently-supported)
 * [Contributing](#contributing)
 * [License](#license)
 
