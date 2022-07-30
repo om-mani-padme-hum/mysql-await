@@ -349,6 +349,13 @@ class PoolAwait {
    */
   constructor() {
     this.pool = mysql.createPool(...arguments);
+    
+    this.config = this.pool.config;
+    
+    if ( arguments[0] && typeof arguments[0].throwErrors == `boolean` && !arguments[0].throwErrors )
+      this.config.throwErrors = false;
+    else
+      this.config.throwErrors = true;
   }
   
   /**
@@ -383,6 +390,11 @@ class PoolAwait {
   awaitGetConnection() {
     return new Promise(async (resolve, reject) => {
       this.pool.getConnection((err, connection) => {
+        if ( this.config.throwErrors )
+          connection.config.throwErrors = true;
+        else
+          connection.config.throwErrors = false;
+        
         if ( err ) {
           this.pool.emit(`error`, err);
           
@@ -452,7 +464,7 @@ class PoolAwait {
                 if ( this.inTransaction ) {
                   this.connection.rollback(() => {
                     this.inTransaction = false;
-                    tconnection.emit(`error`, err);
+                    connection.emit(`error`, err);
                     
                     if ( this.config.throwErrors )
                       reject(err);
