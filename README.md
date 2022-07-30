@@ -1,4 +1,4 @@
-# MySQL Async/Await Wrapper v2.1.8
+# MySQL Async/Await Wrapper v2.2.0
 
 Simple wrapper for MySQL async/await functionality.  Intended for functionality to mimic the popular [mysql](https://github.com/mysqljs/mysql) Node.js callback-based package, but with additional methods for awaiting execution.  Goal is for normal methods to be unaffected and only additional await methods added, though accomplished through intermediary class objects.
 
@@ -56,9 +56,12 @@ The methods below have been added as async/await wrappers to existing MySQL meth
   "host"            : "example.org",
   "user"            : "bob",
   "password"        : "secret",
-  "database"        : "my_db"
+  "database"        : "my_db",
+  "throwErrors"     : false
 }
 ```
+
+**Note:** `throwErrors` is used to determine whether MySQL errors should be thrown AND emitted, or only emitted
 
 ## Example Using Single Connection
 
@@ -217,7 +220,8 @@ Connection 16 released
 Please open an issue for any bugs found or feature requests
 
 * Thanks, @DavidvanDriessche, for identifying a significant issue with error handling
-* THanks, @DonaldKellet, for identifying missing arguments on the escape() and escapeId() functions
+* Thanks, @DonaldKellet, for identifying missing arguments on the escape() and escapeId() functions
+* Thanks, @Andromeda606, for identifying issues with connection.on() events
 
 ## License
 

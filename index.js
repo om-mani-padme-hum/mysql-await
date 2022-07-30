@@ -14,6 +14,10 @@ class ConnectionAwait {
   constructor() {
     this.connection = mysql.createConnection(...arguments);
     this.config = this.connection.config;
+    
+    if ( arguments[0] && arguments[0].throwErrors )
+      this.config.throwErrors = true;
+    
     this.inTransaction = false;
   }
   
@@ -26,8 +30,14 @@ class ConnectionAwait {
   awaitBeginTransaction() {
     return new Promise((resolve, reject) => {
       this.connection.beginTransaction((err) => {
-        if ( err )
-          return reject(err);
+        if ( err ) {
+          this.connection.emit(`error`, err);
+          
+          if ( this.config.throwErrors )
+            reject(err);
+          else
+            resolve();
+        }
 
         this.inTransaction = true;
         resolve();
@@ -44,8 +54,14 @@ class ConnectionAwait {
   awaitChangeUser(params) {
     return new Promise((resolve, reject) => {
       this.connection.changeUser(params, (err) => {
-        if ( err )
-          return reject(err);
+        if ( err ) {
+          this.connection.emit(`error`, err);
+          
+          if ( this.config.throwErrors )
+            reject(err);
+          else
+            resolve();
+        }
 
         resolve();
       });
@@ -64,11 +80,21 @@ class ConnectionAwait {
           if ( this.inTransaction ) {
             this.connection.rollback(() => {
               this.inTransaction = false;
-              reject(err);
+              this.connection.emit(`error`, err);
+              
+              if ( this.config.throwErrors )
+                reject(err);
+              else
+                resolve();
             });
           } else {
             this.inTransaction = false;
-            reject(err);
+            this.connection.emit(`error`, err);
+            
+            if ( this.config.throwErrors )
+              reject(err);
+            else
+              resolve();
           }
         } else {
           this.inTransaction = false;
@@ -86,8 +112,14 @@ class ConnectionAwait {
   awaitConnect() {
     return new Promise((resolve, reject) => {
       this.connection.connect((err) => {
-        if ( err )
-          return reject(err);
+        if ( err ) {
+          this.connection.emit(`error`, err);
+          
+          if ( this.config.throwErrors )
+            return reject(err);
+          else
+            return resolve();
+        }
 
         resolve();
       });
@@ -102,8 +134,14 @@ class ConnectionAwait {
   awaitDestroy() {
     return new Promise((resolve, reject) => {
       this.connection.destroy((err) => {
-        if ( err )
-          return reject(err);
+        if ( err ) {
+          this.connection.emit(`error`, err);
+          
+          if ( this.config.throwErrors )
+            return reject(err);
+          else
+            return resolve();
+        }
 
         resolve();
       });
@@ -118,8 +156,14 @@ class ConnectionAwait {
   awaitEnd() {
     return new Promise((resolve, reject) => {
       this.connection.end((err) => {
-        if ( err )
-          return reject(err);
+        if ( err ) {
+          this.connection.emit(`error`, err);
+          
+          if ( this.config.throwErrors )
+            return reject(err);
+          else
+            return resolve();
+        }
 
         resolve();
       });
@@ -131,7 +175,7 @@ class ConnectionAwait {
    * @param query string First argument of MySQL's Connection.query()
    * @param params Array (optional) Second argument of MySQL's Connection.query() if not used for callback
    * @returns Promise
-   * @description Queries the MySQL database, returning a [Promise] that resolves when finished or rejects on error.  
+   * @description Queries the MySQL database, returning a [Promise] that resolves when finished, emitting an error if one is encountered.  
    */
   awaitQuery(query, params) {
     return new Promise((resolve, reject) => {
@@ -141,10 +185,20 @@ class ConnectionAwait {
             if ( this.inTransaction ) {
               this.connection.rollback(() => {
                 this.inTransaction = false;
-                reject(err);
+                this.connection.emit(`error`, err);
+                
+                if ( this.config.throwErrors )
+                  reject(err);
+                else
+                  resolve();
               });
             } else {
-              reject(err);
+              this.connection.emit(`error`, err);
+              
+              if ( this.config.throwErrors )
+                reject(err);
+              else
+                resolve();
             }
           } else {
             resolve(result);
@@ -156,10 +210,20 @@ class ConnectionAwait {
             if ( this.inTransaction ) {
               this.connection.rollback(() => {
                 this.inTransaction = false;
-                reject(err);
+                this.connection.emit(`error`, err);
+                
+                if ( this.config.throwErrors )
+                  reject(err);
+                else
+                  resolve();
               });
             } else {
-              reject(err);
+              this.connection.emit(`error`, err);
+              
+              if ( this.config.throwErrors )
+                reject(err);
+              else
+                resolve();
             }
           } else {
             resolve(result);
@@ -175,7 +239,7 @@ class ConnectionAwait {
    * @description Rolls back a transaction.
    */
   awaitRollback() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.connection.rollback(() => {
         resolve();
       });
@@ -293,9 +357,15 @@ class PoolAwait {
   awaitEnd() {
     return new Promise((resolve, reject) => {
       this.pool.end((err) => {
-        if ( err )
-          return reject(err);
-
+        if ( err ) {
+          this.pool.emit(`error`, err);
+          
+          if ( this.config.throwErrors )
+            return reject(err);
+          else
+            return resolve();
+        }
+        
         resolve();
       });
     });
@@ -311,8 +381,14 @@ class PoolAwait {
   awaitGetConnection() {
     return new Promise(async (resolve, reject) => {
       this.pool.getConnection((err, connection) => {
-        if ( err )
-          return reject(err);
+        if ( err ) {
+          this.pool.emit(`error`, err);
+          
+          if ( this.config.throwErrors )
+            return reject(err);
+          else
+            return resolve();
+        }
 
         connection.inTransaction = false;
 
@@ -324,8 +400,14 @@ class PoolAwait {
         connection.awaitBeginTransaction = function () {
           return new Promise((resolve, reject) => {
             this.beginTransaction((err) => {
-              if ( err )
-                return reject(err);
+              if ( err ) {
+                connection.emit(`error`, err);
+                
+                if ( this.config.throwErrors )
+                  return reject(err);
+                else
+                  return resolve();
+              }
 
               this.inTransaction = true;
               resolve();
@@ -342,8 +424,14 @@ class PoolAwait {
         connection.awaitChangeUser = function (params) {
           return new Promise((resolve, reject) => {
             this.changeUser(params, (err) => {
-              if ( err )
-                return reject(err);
+              if ( err ) {
+                connection.emit(`error`, err);
+                
+                if ( this.config.throwErrors )
+                  return reject(err);
+                else
+                  return resolve();
+              }
 
               resolve();
             });
@@ -362,11 +450,21 @@ class PoolAwait {
                 if ( this.inTransaction ) {
                   this.connection.rollback(() => {
                     this.inTransaction = false;
-                    reject(err);
+                    tconnection.emit(`error`, err);
+                    
+                    if ( this.config.throwErrors )
+                      reject(err);
+                    else
+                      resolve();
                   });
                 } else {
                   this.inTransaction = false;
-                  reject(err);
+                  connection.emit(`error`, err);
+                  
+                  if ( this.config.throwErrors )
+                    reject(err);
+                  else
+                    resolve();
                 }
               } else {
                 this.inTransaction = false;
@@ -381,14 +479,20 @@ class PoolAwait {
          * @param query string First argument of MySQL's Connection.query()
          * @param params Array (optional) Second argument of MySQL's Connection.query() if not used for callback
          * @returns Promise
-         * @description Queries the MySQL database, returning a [Promise] that resolves when finished or rejects on error.  
+         * @description Queries the MySQL database, returning a [Promise] that resolves when finished, emitting an error if one is encountered.  
          */
         connection.awaitQuery = function (query, params) {
           return new Promise((resolve, reject) => {
             if ( typeof params === `undefined` ) {
               this.query(query, (err, result) => {
-                if ( err )
-                  return reject(err);
+                if ( err ) {
+                  connection.emit(`error`, err);
+                  
+                  if ( this.config.throwErrors )
+                    return reject(err);
+                  else
+                    return resolve();
+                }
 
                 resolve(result);
               });
@@ -398,10 +502,20 @@ class PoolAwait {
                   if ( this.inTransaction ) {
                     this.rollback(() => {
                       this.inTransaction = false;
-                      reject(err);
+                      connection.emit(`error`, err);
+                      
+                      if ( this.config.throwErrors )
+                        reject(err);
+                      else
+                        resolve();
                     });
                   } else {
-                    reject(err);
+                    connection.emit(`error`, err);
+                    
+                    if ( this.config.throwErrors )
+                      reject(err);
+                    else
+                      resolve();
                   }
                 } else {
                   resolve(result);
@@ -417,7 +531,7 @@ class PoolAwait {
          * @description Rolls back a transaction.
          */
         connection.awaitRollback = function () {
-          return new Promise((resolve, reject) => {
+          return new Promise((resolve) => {
             this.rollback(() => {
               resolve();
             });
@@ -434,28 +548,45 @@ class PoolAwait {
    * @param query string First argument of MySQL's Pool.query()
    * @param params Array (optional) Second argument of MySQL's Pool.query() if not used for callback
    * @returns Promise
-   * @description Queries the MySQL database, returning a [Promise] that resolves when finished or rejects on error.  
+   * @description Queries the MySQL database, returning a [Promise] that resolves when finished, emitting an error if one is encountered.  
    */
   awaitQuery(query, params) {
     return new Promise((resolve, reject) => {
       try {
         if ( typeof params === `undefined` ) {
           this.pool.query(query, (err, result) => {
-            if ( err )
-              return reject(err);
+            if ( err ) {
+              this.pool.emit(`error`, err);
+              
+              if ( this.config.throwErrors )
+                return reject(err);
+              else
+                return resolve();
+            }
 
             resolve(result);
           });
         } else {
           this.pool.query(query, params, (err, result) => {
-            if ( err )
-              return reject(err);
+            if ( err ) {
+              this.pool.emit(`error`, err);
+              
+              if ( this.config.throwErrors )
+                return reject(err);
+              else
+                return resolve();
+            }
 
             resolve(result);
           });
         }
       } catch ( err ) {
-        reject(err);
+        this.pool.emit(`error`, err);
+        
+        if ( this.config.throwErrors )
+          reject(err);
+        else
+          resolve();
       }
     });
   }
