@@ -15,7 +15,9 @@ class ConnectionAwait {
     this.connection = mysql.createConnection(...arguments);
     this.config = this.connection.config;
     
-    if ( arguments[0] && arguments[0].throwErrors )
+    if ( arguments[0] && typeof arguments[0].throwErrors == `boolean` && !arguments[0].throwErrors )
+      this.config.throwErrors = false;
+    else
       this.config.throwErrors = true;
     
     this.inTransaction = false;
