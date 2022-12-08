@@ -390,9 +390,9 @@ class PoolAwait {
   awaitGetConnection() {
     return new Promise(async (resolve, reject) => {
       this.pool.getConnection((err, connection) => {
-        if ( this.config.throwErrors )
+        if ( this.config.throwErrors && connection )
           connection.config.throwErrors = true;
-        else
+        else if ( connection )
           connection.config.throwErrors = false;
         
         if ( err ) {
