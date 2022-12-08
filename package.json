@@ -1,6 +1,6 @@
 {
   "name": "mysql-await",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Backward Compatible MySQL Async/Await Connection Wrapper",
   "main": "index.js",
   "dependencies": {
